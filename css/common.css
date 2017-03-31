@@ -1,0 +1,21 @@
+html {
+	margin: 0;
+	padding: 0;
+}
+
+h3 {
+	font: Arial,sans-serif;
+}
+
+.current {
+	background-color: #000531;
+	color: #fff;
+}
+
+nav < li {
+	display: inline-block;
+}
+
+.nav-top {
+	font-size: 1.3rem;
+}
