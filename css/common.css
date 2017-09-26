@@ -1,21 +1,558 @@
+---
+# Front matter comment to ensure Jekyll properly reads file.
+---
+
 html {
 	margin: 0;
 	padding: 0;
+	box-sizing: border-box; 
 }
 
-h3 {
-	font: Arial,sans-serif;
+*, *::before, *::after {
+  box-sizing: inherit;
 }
+
+body {
+	font-family: 'Work Sans', Roboto, Arial,sans-serif; /* 'Work Sans' */
+	margin:0;
+	-webkit-font-smoothing: antialiased;
+}
+
+a {
+	text-decoration: none;
+	color: blue;
+}
+
+a:hover {
+	border-bottom: 2px solid;
+}
+
+
+h1 {
+	font-size: 3em; /* 2.5em */
+}
+
+::selection { background: yellow;}
+
+div {
+	position:relative;
+}
+
+img {
+	width:100%;
+}
+
+ul {
+	list-style:none;
+}
+
+:root{
+	--blue: ;
+}
+
+.gifbg {
+	background: url('../img/gif_bg2.gif') no-repeat center center fixed; 
+	background-size: cover;
+}
+
+
+
+/* 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+C O L O R S
+
+*/
+
+.black_bg {
+	background-color: #12071c;
+	color:white;
+}
+
+.white_bg {
+	background-color: white;
+}
+
+.gray_bg {
+	background-color: #f7f7f7;
+}
+
+.gray_bg2 {
+	background-color: #ddd; /* for against exile only */
+}
+
+.gray_text {
+	color:#eee;
+}
+
+.yellow_bg {
+	background-color: #ede595;
+}
+
+.red_bg {
+	background-color: #f3b8b8;
+}
+
+
+/* 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+N A V I G A T I O N 
+
+*/
 
 .current {
-	background-color: #000531;
-	color: #fff;
+	color: blue; /* #8000FF */
+	border-bottom: 2px solid blue;
 }
 
-nav < li {
+nav {
+	margin-bottom:0;
+}
+
+nav li {
 	display: inline-block;
+	margin-right:10px;
+	font-weight:400;
+}
+
+li a {
+	color:black;
 }
 
 .nav-top {
-	font-size: 1.3rem;
+	font-size: 1rem;
+	padding-left:5%;
+	margin-bottom:5%;
 }
+
+.nav-bottom {
+	font-size: 1rem;
+	padding:0;
+}
+
+
+/* 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+P R O J E C T  L I S T  UL/LI
+
+*/
+
+#rocklist {width:auto;}
+
+.loo li {
+	margin:5px;
+	padding:10px;
+	border:1px solid black;
+	display:inline-block;
+}
+
+.loo li a {
+	text-decoration:none;
+}
+
+.loo li a:hover {
+	background-color:blue;
+	color:white;
+}
+
+
+
+
+
+/* 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+R O C K S
+
+*/
+
+#rocks {width: auto;}
+
+.goo {
+   	width:calc(33vw); /* width:calc(33vw - 15px); */
+   	/*height:calc(33vw - 15px);*/
+   	position:relative; 
+   	margin:0; /* margin:5px 5px 0 0; */
+   	float:left;
+   	border:0px !important;
+   	} 
+
+.goo div img{width:100%;}
+   
+.end{display:none;}
+    
+.goo:hover div.start{display:none;}
+.goo:hover div.end{display:block;}
+
+
+/* TRANSFORMATIONS */
+
+.deg71 img {
+	transform: rotate(71deg);
+}
+
+.skewY img {
+	transform: skewY(30deg);
+}
+
+.translate img {
+	transform: translateX(300px);
+	transform: translateY(-200px);
+}
+
+/* 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+P R O J E C T   P A G E   A N D   L I S T S
+
+*/
+
+.hometext {
+	font-weight:200;  /* work sans: 200   Open sans: 100 */
+	text-transform:uppercase;
+	background-color:white;
+	display: inline;
+	line-height:1.3em;
+}
+
+.highlight a {
+	color:black;
+}
+
+.highlight a:hover {
+	background-color:#effeff;
+	color:blue;
+}
+
+.projectinfo {
+	margin-left:20%;
+	margin-bottom:5%;
+}
+
+.projecttype {
+	font-weight:300;	/* work sans: 300  Open sans: 100 */
+	margin-bottom:2%;
+}
+
+.projectname {
+	font-weight:200;  /* work sans: 200   Open sans: 100 */
+	text-transform: uppercase;
+}
+
+.projectname2 {
+	font-weight:400;
+	text-transform: uppercase;
+}
+
+
+.projectplace {
+	font-weight:300;	/* work sans: 300   Open sans: 100 */
+	color: black;
+	text-transform: uppercase;
+	letter-spacing: normal;
+}
+
+.projectyear {
+	font-weight:300;	/* work sans: 300   Open sans: 100 */
+	color: gray;
+	letter-spacing: normal;
+}
+
+.full {
+  width:100%; /* content-box:60%; */
+  padding:5% 20% 5% 20%;
+  height:auto;
+}
+
+.projectheadline {
+	font-weight: 300;
+	line-height: 1.5;
+	font-size:1em;
+	color: black;	/*#2490c6;*/
+	margin-bottom:5%;
+	text-transform:uppercase;
+}
+
+.projecttext {
+  /*column-count: 2;
+  column-gap:4em;*/
+  font-family:'Lekton', Helvetica;
+  font-weight:400;
+  line-height:1.75;
+  font-size:1.15em;
+  color:#666;
+}
+
+.projectcaption {
+    font-weight: 300;
+    line-height: 1.5;
+    font-size:.65em;
+    /*text-transform: uppercase;*/
+    color:black;
+    background-color:white;
+    padding: 2px 5px 2px 5px;
+}
+
+.projectcaption_k {
+    font-weight: 300;
+    line-height: 1.5;
+    font-size:.65em;
+    /*text-transform: uppercase;*/
+    color:black;
+    background-color:white;
+    border:1px black solid;
+    padding: 2px 5px 2px 5px;
+}
+
+.blurb {
+  font-family:'Lekton', Helvetica;
+  font-weight:400;
+  line-height:1.2;
+  font-size:1em;
+  color:#666;
+}
+
+.collabs {
+	font-weight:300;
+	color:gray;
+	padding-top:5px;
+}
+
+
+.hide span {
+	display:none;
+}
+
+.hide:hover span {
+	display:block;
+}
+
+.captionbox {
+	position: absolute;
+	z-index: 100;
+	left: 20px;
+	bottom: 20px;
+}
+
+
+/* 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+T E X T   M O D I F I C A T I O N S 
+
+*/
+
+.l {
+  font-family:'Lekton', Helvetica;
+  font-weight:400;
+}
+
+.uline {
+	border-bottom:1px solid black;
+}
+
+.break {
+	word-break: break-all;
+}
+
+/* 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+V I S U A L S
+
+*/
+
+.fullbleed {
+	width: 100%;
+	overflow: hidden;
+}
+
+.border1 {
+	width: 100%;
+	overflow: hidden;
+	padding:10%;
+}
+
+.border2 {
+	width: 100%;
+	overflow: hidden;
+	/* background-color: #f7f7f7;*/ /*#f9f9f9;*/
+	padding:10% 30% 10% 30%;
+}
+
+.border3 {
+	width: 100%;
+	overflow:hidden;
+	padding:2.5%;
+}
+
+.notop {
+	padding-top:0;
+}
+
+.top5 {
+	margin-top:5%;
+}
+
+.left5 {
+	margin-left:5%;
+}
+
+
+/* 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+I M A G E   B O X E S
+
+*/
+
+.grid img {
+  max-width:100%;
+}
+
+.grid_2h {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap:5px;
+}
+
+.grid_3h {
+	display:grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	grid-gap: 5px;
+}
+
+.grid_4h {
+	display:grid;
+	grid-template-columns: 5% 1fr 1fr 1fr 1fr 5%;
+	grid-gap: 5px;
+}
+
+.grid_4h ul {
+	padding:0;
+}
+
+
+.inline {
+	display:inline-block;
+	vertical-align:top;
+	margin-right:20px;
+}
+
+.frame {
+	border-bottom: 3px solid black;
+}
+
+
+/* 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+F O O T E R 
+
+*/
+
+footer {
+	border-top: 1px solid #eee;
+	margin-top:5%;
+	padding: 5% 0 5% 0;
+}
+
+
+
+/* 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+M O B I L E 
+
+*/
+
+@media screen and (max-width: 900px) {
+
+	.projecttext {
+	  font-weight:200;
+	  line-height:1.75;
+	  font-size:1.15em;
+	}
+
+}
+
+
+
+
+/* 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+R O C K S 2  —  O R I G I N A L
+
+*/
+
+#rocks2 {
+	width: 100%;
+}
+
+
+.foo {border:0px !important;}
+
+.foo img {width:30%;} 
+.foo img:first-child{display:inline-block;}
+.foo img:last-child{display:none;}
+/*.foo .name {visibility:hidden;} NOT NECESSARY */
+
+.foo:hover img:first-child{display:none;}
+.foo:hover img:last-child{display:inline-block;}
+/* .foo:hover .name {visibility:visible;} NOT NECESSARY */
+
+
+/* CORRESPONDING HTML
+
+<div id="rocks">
+	<a class="foo" href="#">
+		<img src="/img/item1.svg">
+		<img src="/img/item1hover2.svg">
+	</a>
+	<a class="foo" href="#"> 
+		<img src="/img/item1.svg">
+		<img src="/img/item1hover.svg">
+	</a>
+	<a class="foo" href="#"> 
+		<img src="/img/item3.png">
+		<img src="/img/item3hover.svg">
+	</a>
+	<a class="foo" href="#">
+		<img src="/img/item5.png">
+		<img src="/img/item5hover.svg">
+	</a>
+	<a class="foo" href="#">
+		<img src="/img/item5.png">
+		<img src="/img/item5hover.svg">
+	</a>
+	<a class="foo" href="#">
+		<img src="/img/item6.png">
+		<img src="/img/item6hover.svg">
+	</a>
+</div>
+
+*/
+
+
+
+/* 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+R O C K S  —  A L T  —  A S   S E E N   I N   I N D E X  3  .H T M L 
+
+*/
+
+
+/* CONTAINER DIV */
+
+    #rocks3 {width: auto;}
+ 
+    #rocks3 a { 
+        width: 30%;
+        display: inline-block;
+        border:0px !important;
+    }
+
+/* EACH IMAGE ELEMENT */
+
+    .moo img {width:100%; height: auto;} 
+
+    .moo img:first-child{display:inline-block;}
+    .moo img:last-child{display:none;}
+
+    .moo:hover img:first-child{display:none;}
+    .moo:hover img:last-child{display:inline-block;}
+
+/* 
+

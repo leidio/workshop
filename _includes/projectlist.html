@@ -1,0 +1,15 @@
+<ul>
+	{% for humdinger in site.pages %}
+		{% if humdinger.type == include.type %}
+		<li>
+			<br>
+			<div>
+			<a href="{{site.baseurl}}{{humdinger.url}}" class="l">{{humdinger.title}}</a>
+			<br>
+			<span class="blurb">{{humdinger.blurb}}</span>
+			</div>
+			<br>
+		</li>
+		{% endif %}
+	{% endfor %}
+</ul>

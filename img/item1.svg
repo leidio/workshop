@@ -1,0 +1,20 @@
+<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+ <defs>
+  <linearGradient y2="0.015625" x2="1" y1="0" x1="0" id="svg_3">
+   <stop offset="0" stop-color="#0fffff"/>
+   <stop offset="1" stop-opacity="0.996094" stop-color="#ffffaa"/>
+  </linearGradient>
+ </defs>
+ <g>
+  <title>background</title>
+  <rect fill="#fff" id="canvas_background" height="402" width="402" y="-1" x="-1"/>
+  <g display="none" overflow="visible" y="0" x="0" height="100%" width="100%" id="canvasGrid">
+   <rect fill="url(#gridpattern)" stroke-width="0" y="0" x="0" height="100%" width="100%"/>
+  </g>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <path stroke="#000" id="svg_1" d="m94.60356,42.864025c-152.364769,46.667239 -79.920131,189.720577 -37.629782,242.072274c42.290348,52.351707 297.240763,172.012736 327.448161,69.17904c30.207389,-102.833706 3.770947,-256.302509 -62.68533,-157.208217c-66.456267,99.094292 -99.292699,-9.086736 -50.828096,-66.286817c48.464603,-57.200081 -23.940183,-134.423519 -176.304953,-87.756279z" stroke-width="0" fill="url(#svg_3)"/>
+ </g>
+</svg>

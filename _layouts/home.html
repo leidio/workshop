@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<meta charset="utf-8">
+	<title>Workshop</title>
+	<!--<link href="{{site.baseurl}}/css/normalise.css" rel="stylesheet">-->
+	<link href="{{site.baseurl}}/css/common.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Work+Sans:200,300,400,500,600,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Karla:400,700" rel="stylesheet">
+	<!-- <link href="https://fonts.googleapis.com/css?family=Raleway:100,200,300,400,500,600,700" rel="stylesheet"> -->
+</head>
+<body class="gifbg">
+
+<header>
+	<!--<strong>Patrick</strong>-->
+	<br>
+	{% include nav.html navclass='nav-top' %}
+</header>
+
+{{content}}
+
+<footer>
+	<!-- <i>Footer</i> -->
+	{% include nav.html navclass='nav-bottom' %}
+</footer>
+
+</body>
+</html>

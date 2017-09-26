@@ -1,7 +1,8 @@
 <nav>
-	<ul class="nav {{include.navclass}}">
+	<ul class="nav l {{include.navclass}}">
 		<li><a href="{{site.baseurl}}/index.html" class="{% if page.url == '/' %}current{% endif %}">Home</a></li>
-		<li><a href="{{site.baseurl}}/about.html" class="{% if page.url == '/about.html' %}current{% endif %}">About</a></li>
-		<li><a href="{{site.baseurl}}/work.html" class="{% if page.url == '/work.html' %}current{% endif %}">Work</a></li>
+		<li><a href="{{site.baseurl}}/about.html" class="{% if page.url == '/ethos.html' %}current{% endif %}">Ethos</a></li>
+		<li><a href="{{site.baseurl}}/projects" class="{% if page.url contains 'projects' %}current{% endif %}">Work</a></li>
+		<li><a href="{{site.baseurl}}/whiteboard.html" class="{% if page.url contains 'whiteboard' or page.url contains 'architecture.html' or page.url contains 'cities' %}current{% endif %}">Whiteboard</a></li>
 	</ul>
 </nav>
