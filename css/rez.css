@@ -1,0 +1,244 @@
+---
+# Front matter comment to ensure Jekyll properly reads file.
+---
+
+footer {
+    border:none;
+	margin-top:5%;
+    margin-bottom:5%;
+    padding:0;
+}
+
+
+.rezcurrent {
+    font-family: 'Lekton', Helvetica;
+    font-weight:300;
+	margin-bottom:2%;
+    color:black;
+}
+
+.rezinfo {
+	margin-left:5%;
+	/*margin-bottom:2%;*/
+}
+
+.rezinfo a {
+    color:gray;
+}
+
+.rezfull {
+  width:100%;
+  margin-top:2%;
+  padding: 0 10% 0 10%;
+  height:auto;
+}
+
+.rezcategory {
+	font-weight: 300;
+	font-size:1em;
+	text-transform:uppercase;
+    color:blue;
+    margin-top:5%;
+}
+
+
+.reztopic {
+    font-weight:300;
+    font-size:1em;
+    color:blue;   
+}
+
+.reztitle {
+    font-weight:500;
+    font-size:1em;
+    margin-bottom:7px;
+}
+
+.rezyear {
+    font-weight:300;
+    font-size:.85em;
+    text-align:right;
+    padding-top:1%;
+}
+
+.rezposition {
+  font-family:'Lekton', Helvetica;
+  margin-bottom:7px;
+  text-transform:none;
+}
+
+.rezlocation {
+  font-family:'Lekton', Helvetica;
+  margin-bottom:7px;
+}
+
+.reztext {
+  font-family:'Lekton', Helvetica;
+  font-size:1em;
+  line-height:1.25;
+  color:#666;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+ G R I D S  &  L A Y O U T
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+.rezgrid_2h {
+  display: grid;
+  grid-template-columns: 10% auto;
+  grid-gap:2%;
+}
+
+.rezgrid_4h {
+    display:grid;
+    grid-template-columns: 10% 15% 2% auto;
+    grid-gap:2%;
+}
+
+.right10 {
+    padding-right:10%;
+}
+
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+ N A R R A T I V E 
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+.fullv {
+  min-height: calc(75vh - 76px);
+  display:flex;
+  flex-direction:column;
+}
+
+.fullv > div {
+  flex: 1;
+}
+
+.narr-counter {
+    font-weight:300;
+    font-size:.85em;
+    margin-bottom:-2%;
+}
+
+.narr-projectheadline {
+	font-weight: 300;
+	line-height: 1.5;
+	font-size:1.25em;
+	color: black;
+	margin-top:5%;
+	text-transform:uppercase;
+}
+
+.narr-projectname {
+	font-weight:200;
+	text-transform: uppercase;
+}
+
+.narr-projectquestion {
+    font-family: 'Lekton', Helvetica;
+    font-size:1.25em;
+}
+
+.narr-projecttext {
+    font-family: 'Lekton', Helvetica;
+    font-size:1.5em;
+    line-height:1.5;
+}
+
+
+.narr-headline {
+    font-weight:200;
+    letter-spacing: -1px;
+    font-size:2em;
+}
+
+.narr-callout {
+    font-family: 'Lekton', Helvetica;
+    letter-spacing:-1px;
+    font-size:5em;
+}
+
+.strike {
+    text-decoration: line-through;
+}
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+ C O L O R S
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+.op80 {
+    opacity:0.8;
+}
+
+.blue1 {
+    color:blue;
+}
+
+.blue1_bg {
+    background-color:#E0F7FA;
+    color:blue;/*#0288D1;*/
+}
+
+.blue1_border {
+    border: 20px solid #E0F7FA;
+    padding: 5% 5% 5% calc(5% - 20px);
+}
+
+
+.green1_bg {
+    background-color:#E2FFF8;
+    color:#00C853; /*#00E0AC; #00FFC3*/
+}
+
+.green1_border {
+    border: 20px solid #E2FFF8;
+    padding: 5% 5% 5% calc(5% - 20px);
+}
+
+
+.yellow1_bg {
+    background-color:#FFFDE7;
+    color:#F9A825;
+}
+
+.yellow1_border {
+    border: 20px solid #FFFDE7;
+    padding: 5% 5% 5% calc(5% - 20px);
+}
+
+
+.blue2_bg {
+    background-color:#E3F2FD;
+    color:#651FFF;
+}
+
+.blue2_border {
+    border: 20px solid #E3F2FD;
+    padding: 5% 5% 5% calc(5% - 20px);
+}
+
+
+.red1_bg {
+    background-color:#FFEBEE;
+    color:#F50057;
+}
+
+.red1_border {
+    border: 20px solid #FFEBEE;
+    padding: 5% 5% 5% calc(5% - 20px);
+}
+
+.green2_bg {
+    background-color:#F9FBE7;
+    color:#64DD17;
+}
+
+.green2_border {
+    border: 20px solid #F9FBE7;
+    padding: 5% 5% 5% calc(5% - 20px);
+}

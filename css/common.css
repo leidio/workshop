@@ -55,6 +55,12 @@ ul {
 	background-size: cover;
 }
 
+.wip {
+	color:blue;
+	font-size:2.5em;
+	font-weight:100;
+	margin-bottom:5%;
+}
 
 
 /* 
@@ -344,7 +350,7 @@ T E X T   M O D I F I C A T I O N S
 }
 
 .uline {
-	border-bottom:1px solid black;
+	border-bottom:1px solid;
 }
 
 .break {
@@ -360,6 +366,12 @@ V I S U A L S
 .fullbleed {
 	width: 100%;
 	overflow: hidden;
+}
+
+.border0 {
+    width:100%;
+    overflow:hidden;
+    padding:5%;
 }
 
 .border1 {
@@ -391,6 +403,14 @@ V I S U A L S
 
 .left5 {
 	margin-left:5%;
+}
+
+.left2 {
+	margin-left:2%;
+}
+
+.bottom5 {
+    margin-bottom:5%;
 }
 
 
@@ -426,6 +446,19 @@ I M A G E   B O X E S
 	padding:0;
 }
 
+.grid_2h2v {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  grid-gap:5px;
+}
+
+.grid_2h2v .fullh {
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    grid-row-end: 3;
+}
 
 .inline {
 	display:inline-block;
@@ -435,6 +468,10 @@ I M A G E   B O X E S
 
 .frame {
 	border-bottom: 3px solid black;
+}
+
+.w40 {
+    width:40vw;
 }
 
 

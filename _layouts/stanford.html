@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<meta charset="utf-8">
+	<title>Patrick Stowe Jones</title>
+	<!--<link href="{{site.baseurl}}/css/normalise.css" rel="stylesheet">-->
+	<link href="{{site.baseurl}}/css/common.css" rel="stylesheet">
+    <link href="{{site.baseurl}}/css/rez.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Work+Sans:200,300,400,500,600,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Inconsolata:400,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Karla:400,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Lekton:400,700" rel="stylesheet">
+	<!-- <link href="https://fonts.googleapis.com/css?family=Raleway:100,200,300,400,500,600,700" rel="stylesheet"> -->
+</head>
+<body>
+
+<header>
+    <br>
+    <span class="l left5">d.school Teaching Fellowship 2018-2019</span>
+    <br>
+    <br>
+    <div class="left5">
+        <a href="{{site.baseurl}}/resume.html" class="{% if page.url contains 'resume' %}rezcurrent{% endif %}"><span class="l">Resume</span></a>
+        <a href="{{site.baseurl}}/narrative.html" class="{% if page.url contains 'narrative' %}rezcurrent{% endif %} left2"><span class="l">Work</span></a>
+        <a href="{{site.baseurl}}/aboutme.html" class="{% if page.url contains 'aboutme' %}rezcurrent{% endif %} left2"><span class="l">About Me</span></a>
+    </div>
+</header>
+    
+{{content}}
+
+<footer>
+    <div class="left5">
+        <a href="{{site.baseurl}}/resume.html" class="{% if page.url contains 'resume' %}rezcurrent{% endif %}"><span class="l">Resume</span></a>
+        <a href="{{site.baseurl}}/narrative.html" class="{% if page.url contains 'narrative' %}rezcurrent{% endif %} left2"><span class="l">Work</span></a>
+        <a href="{{site.baseurl}}/aboutme.html" class="{% if page.url contains 'aboutme' %}rezcurrent{% endif %} left2"><span class="l">About Me</span></a>
+    </div>
+</footer>
+
+</body>
+</html>
