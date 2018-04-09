@@ -186,7 +186,7 @@ footer {
 
 .blue1_border {
     border: 20px solid #E0F7FA;
-    padding: 5% 5% 5% calc(5% - 20px);
+    padding: 5%;
 }
 
 
@@ -197,7 +197,7 @@ footer {
 
 .green1_border {
     border: 20px solid #E2FFF8;
-    padding: 5% 5% 5% calc(5% - 20px);
+    padding: 5%;
 }
 
 
@@ -208,7 +208,7 @@ footer {
 
 .yellow1_border {
     border: 20px solid #FFFDE7;
-    padding: 5% 5% 5% calc(5% - 20px);
+    padding: 5%;
 }
 
 
@@ -219,7 +219,7 @@ footer {
 
 .blue2_border {
     border: 20px solid #E3F2FD;
-    padding: 5% 5% 5% calc(5% - 20px);
+    padding: 5%;
 }
 
 
@@ -230,7 +230,7 @@ footer {
 
 .red1_border {
     border: 20px solid #FFEBEE;
-    padding: 5% 5% 5% calc(5% - 20px);
+    padding: 5%;
 }
 
 .green2_bg {
@@ -240,5 +240,5 @@ footer {
 
 .green2_border {
     border: 20px solid #F9FBE7;
-    padding: 5% 5% 5% calc(5% - 20px);
+    padding: 5%; /* calc(5% - 20px) */
 }
