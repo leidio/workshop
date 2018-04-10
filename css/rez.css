@@ -172,7 +172,12 @@ footer {
 - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 .op80 {
-    opacity:0.8;
+    opacity:0.9;
+}
+
+.op80:hover {
+    opacity:1.0;
+    transition: opacity .3s;
 }
 
 .blue1 {

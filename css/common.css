@@ -287,10 +287,10 @@ P R O J E C T   P A G E   A N D   L I S T S
 }
 
 .projectcaption {
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1.5;
     font-size:.65em;
-    /*text-transform: uppercase;*/
+    text-transform: uppercase; /* originally this was turned off */
     color:black;
     background-color:white;
     padding: 2px 5px 2px 5px;
