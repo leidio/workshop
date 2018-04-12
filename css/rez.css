@@ -9,6 +9,27 @@ footer {
     padding:0;
 }
 
+.absolutewrapper {
+    position:absolute;
+    height:100%;
+    width:100%;
+}
+
+.panels {
+    position: relative;
+    z-index:1000;
+}
+
+#panel_a {
+    position:fixed;
+    padding-top:0;
+    z-index:-99;
+}
+
+#panel_b {
+    margin-top:100%;
+}
+
 
 .rezcurrent {
     font-family: 'Lekton', Helvetica;
@@ -180,6 +201,10 @@ footer {
     transition: opacity .3s;
 }
 
+.white_bg {
+    background-color:white;
+}
+
 .blue1 {
     color:blue;
 }
@@ -251,7 +276,7 @@ footer {
 .t0 {
     height:100vh;
     background: rgb(255,255,255);
-background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(224,247,250,1) 100%);
+background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(224,247,250,1) 100%);
 }
 
 .t1 {
