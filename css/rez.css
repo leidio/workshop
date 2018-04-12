@@ -247,3 +247,33 @@ footer {
     border: 20px solid #F9FBE7;
     padding: 5%; /* calc(5% - 20px) */
 }
+
+.t0 {
+    height:100vh;
+    background: rgb(255,255,255);
+background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(224,247,250,1) 100%);
+}
+
+.t1 {
+    height:100vh;
+    background: rgb(224,247,250);
+background: linear-gradient(180deg, rgba(224,247,250,1) 0%, rgba(255,253,231,1) 100%);
+}
+
+.t2 {
+    height:100vh;
+    background: rgb(255,253,231);
+background: linear-gradient(180deg, rgba(255,253,231,1) 0%, rgba(227,242,253,1) 100%);
+}
+
+.t3 {
+    height:100vh;
+    background: rgb(227,242,253);
+background: linear-gradient(180deg, rgba(227,242,253,1) 0%, rgba(255,235,238,1) 100%);
+}
+
+.t4 {
+    height:100vh;
+    background: rgb(255,235,238);
+background: linear-gradient(180deg, rgba(255,235,238,1) 0%, rgba(249,251,231,1) 100%);
+}
