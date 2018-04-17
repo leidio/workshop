@@ -23,6 +23,7 @@ footer {
 #panel_a {
     position:fixed;
     padding-top:0;
+    margin-top:-5%;
     z-index:-99;
 }
 
@@ -120,6 +121,10 @@ footer {
 
 .right10 {
     padding-right:10%;
+}
+
+.bottborder {
+    border-bottom: 4px white solid;
 }
 
 
@@ -230,10 +235,13 @@ footer {
     padding: 5%;
 }
 
+.yellow1 {
+    color:#FF5722;
+}
 
 .yellow1_bg {
     background-color:#FFFDE7;
-    color:#F9A825;
+    color:#FF5722; /* #F9A825 */
 }
 
 .yellow1_border {
@@ -280,13 +288,13 @@ background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(224,247,250,1) 
 }
 
 .t1 {
-    height:100vh;
+    height:200vh;
     background: rgb(224,247,250);
 background: linear-gradient(180deg, rgba(224,247,250,1) 0%, rgba(255,253,231,1) 100%);
 }
 
 .t2 {
-    height:100vh;
+    height:200vh;
     background: rgb(255,253,231);
 background: linear-gradient(180deg, rgba(255,253,231,1) 0%, rgba(227,242,253,1) 100%);
 }
