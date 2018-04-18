@@ -483,8 +483,7 @@ F O O T E R
 
 footer {
 	border-top: 1px solid #eee;
-	margin-top:5%;
-	padding: 5% 0 5% 0;
+	margin: 5% 0 5% 0;
     background-color:white;
 }
 
