@@ -2,13 +2,13 @@
 # Front matter comment to ensure Jekyll properly reads file.
 ---
 
-footer {
+/*footer {
     border:none;
 	margin-top:5%;
     margin-bottom:5%;
     padding:0;
 }
-
+*/
 .absolutewrapper {
     position:absolute;
     height:100%;
