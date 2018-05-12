@@ -576,15 +576,73 @@ M O B I L E   B R E A K   P O I N T S
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 */
 
-@media screen and (max-width: 900px) {
 
-	.projecttext {
-	  font-weight:200;
-	  line-height:1.75;
-	  font-size:1.15em;
-	}
 
+/*@mixin for-phone-only*/
+  @media only screen and (max-width: 599px) {
+      
+    .work_grid_2h {
+  display: grid;
+ grid-template-columns:1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-gap:0px;
+      }
+
+      .work_grid_2h img {
+    height:50vh;
+    display:block;
+    object-fit:cover;
+    vertical-align:top;
+    overflow:hidden;
+      }  
 }
+
+
+/*@mixin for-tablet-portrait-up*/
+  @media (min-width: 600px) {
+      
+      
+}
+
+
+/*@mixin for-tablet-landscape-up*/
+  @media (min-width: 900px) {
+      
+      
+}
+/*@mixin for-desktop-up*/
+
+
+  @media (min-width: 1200px) {
+      
+      
+}
+
+
+/*@mixin for-big-desktop-up*/
+  @media (min-width: 1800px) {
+      
+      
+}
+
+
+/* SASS 
+@mixin for-phone-only {
+  @media (max-width: 599px) { @content; }
+}
+@mixin for-tablet-portrait-up {
+  @media (min-width: 600px) { @content; }
+}
+@mixin for-tablet-landscape-up {
+  @media (min-width: 900px) { @content; }
+}
+@mixin for-desktop-up {
+  @media (min-width: 1200px) { @content; }
+}
+@mixin for-big-desktop-up {
+  @media (min-width: 1800px) { @content; }
+}
+*/
 
 
 /*
