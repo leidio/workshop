@@ -584,7 +584,6 @@ M O B I L E   B R E A K   P O I N T S
     .work_grid_2h {
   display: grid;
  grid-template-columns:1fr;
-  grid-template-rows: 1fr 1fr;
   grid-gap:0px;
       }
 
@@ -592,9 +591,12 @@ M O B I L E   B R E A K   P O I N T S
     height:50vh;
     display:block;
     object-fit:cover;
-    vertical-align:top;
     overflow:hidden;
       }  
+      
+      .border1 {
+       width:inherit;
+      }
 }
 
 
