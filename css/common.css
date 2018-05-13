@@ -420,6 +420,10 @@ V I S U A L S
 	padding-top:0;
 }
 
+.top2 {
+    margin-top:2%;
+}
+
 .top5 {
 	margin-top:5%;
 }
@@ -438,6 +442,10 @@ V I S U A L S
 
 .bottom5 {
     margin-bottom:5%;
+}
+
+.sat {
+    filter:grayscale(100%);
 }
 
 .sat-inv {
@@ -481,18 +489,21 @@ I M A G E   L A Y O U T   B O X   G R I D
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 */
 
-/*
-THIS IS REDUNDANT 
+
 
 .grid img {
-  max-width:100%;
+  width:100%;
+  display:block;
 }
-*/
 
 .grid_2h {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap:5px;
+}
+
+.auto-2h {
+    grid-template-columns:auto auto;
 }
 
 .grid_3h {
@@ -581,22 +592,47 @@ M O B I L E   B R E A K   P O I N T S
 /*@mixin for-phone-only*/
   @media only screen and (max-width: 599px) {
       
-    .work_grid_2h {
+      
+.projectinfo {
+    margin:10%;
+      }
+    
+.grid_2h {
   display: grid;
- grid-template-columns:1fr;
+  grid-template-columns: 1fr;
+  grid-gap:0px;
+}
+
+    
+.work_grid_2h {
+  display: grid;
+  grid-template-columns:1fr;
   grid-gap:0px;
       }
 
-      .work_grid_2h img {
+.work_grid_2h img {
     height:50vh;
     display:block;
     object-fit:cover;
     overflow:hidden;
-      }  
+    }  
       
-      .border1 {
-       width:inherit;
+.border1 {
+   width:inherit;
+  }
+      
+.full {
+    padding: 5%;
+    }
+      
+.top2 {
+    margin-top:5%;
       }
+      
+.rezgrid_4h {
+    grid-template-columns: 10% 20% 5% auto;
+}
+      
 }
 
 

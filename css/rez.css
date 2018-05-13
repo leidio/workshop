@@ -125,9 +125,12 @@
 }
 
 .bottborder {
-    border-bottom: 4px white solid;
+    border-bottom: 5px white solid;
 }
 
+.bottborder2 {
+    margin-bottom:5px;
+}
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -292,7 +295,12 @@ background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(224,247,250,1) 
 
 .t0b {
     background: rgb(255,255,255);
-background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(224,247,250,1) 100%);
+background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(224,247,250,1) 100%);
+}
+
+.t0-rev {
+    background: rgb(255,255,255);
+background: linear-gradient(180deg, rgba(224,247,250,1) 100%, rgba(255,255,255,0) 0%);
 }
 
 .t1 {
@@ -306,10 +314,25 @@ background: linear-gradient(180deg, rgba(224,247,250,1) 0%, rgba(255,253,231,1) 
 background: linear-gradient(180deg, rgba(224,247,250,1) 0%, rgba(255,253,231,1) 100%);
 }
 
+.t1c {
+        background: rgb(224,247,250);
+background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,253,231,1) 100%);
+}
+
 .t2 {
     height:200vh;
     background: rgb(255,253,231);
 background: linear-gradient(180deg, rgba(255,253,231,1) 0%, rgba(227,242,253,1) 100%);
+}
+
+.t2b {
+    background: rgb(255,253,231);
+background: linear-gradient(180deg, rgba(255,253,231,1) 0%, rgba(227,242,253,1) 100%);
+}
+
+.t2c {
+    background: rgb(255,253,231);
+background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(227,242,253,1) 100%);
 }
 
 .t3 {
@@ -318,8 +341,28 @@ background: linear-gradient(180deg, rgba(255,253,231,1) 0%, rgba(227,242,253,1) 
 background: linear-gradient(180deg, rgba(227,242,253,1) 0%, rgba(255,235,238,1) 100%);
 }
 
+.t3b {
+    background: rgb(227,242,253);
+background: linear-gradient(180deg, rgba(227,242,253,1) 0%, rgba(255,235,238,1) 100%);
+}
+
+.t3c {
+    background: rgb(227,242,253);
+background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,235,238,1) 100%);
+}
+
 .t4 {
     height:100vh;
     background: rgb(255,235,238);
 background: linear-gradient(180deg, rgba(255,235,238,1) 0%, rgba(249,251,231,1) 100%);
+}
+
+.t4b {
+    background: rgb(255,235,238);
+background: linear-gradient(180deg, rgba(255,235,238,1) 0%, rgba(249,251,231,1) 100%);
+}
+
+.t4c {
+    background: rgb(255,235,238);
+background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(249,251,231,1) 100%);
 }
