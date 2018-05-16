@@ -70,7 +70,6 @@ ul {
 	color:blue;
 	font-size:2.5em;
 	font-weight:100;
-	margin-bottom:5%;
 }
 
 
@@ -577,110 +576,6 @@ footer {
     background-color:white;
 }
 
-
-
-/* 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-M O B I L E   B R E A K   P O I N T S 
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-*/
-
-
-
-/*@mixin for-phone-only*/
-  @media only screen and (max-width: 599px) {
-      
-      
-.projectinfo {
-    margin:10%;
-      }
-    
-.grid_2h {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-gap:0px;
-}
-
-    
-.work_grid_2h {
-  display: grid;
-  grid-template-columns:1fr;
-  grid-gap:0px;
-      }
-
-.work_grid_2h img {
-    height:50vh;
-    display:block;
-    object-fit:cover;
-    overflow:hidden;
-    }  
-      
-.border1 {
-   width:inherit;
-  }
-      
-.full {
-    padding: 5%;
-    }
-      
-.top2 {
-    margin-top:5%;
-      }
-      
-.rezgrid_4h {
-    grid-template-columns: 10% 20% 5% auto;
-}
-      
-}
-
-
-/*@mixin for-tablet-portrait-up*/
-  @media (min-width: 600px) {
-      
-      
-}
-
-
-/*@mixin for-tablet-landscape-up*/
-  @media (min-width: 900px) {
-      
-      
-}
-/*@mixin for-desktop-up*/
-
-
-  @media (min-width: 1200px) {
-      
-      
-}
-
-
-/*@mixin for-big-desktop-up*/
-  @media (min-width: 1800px) {
-      
-      
-}
-
-
-/* SASS 
-@mixin for-phone-only {
-  @media (max-width: 599px) { @content; }
-}
-@mixin for-tablet-portrait-up {
-  @media (min-width: 600px) { @content; }
-}
-@mixin for-tablet-landscape-up {
-  @media (min-width: 900px) { @content; }
-}
-@mixin for-desktop-up {
-  @media (min-width: 1200px) { @content; }
-}
-@mixin for-big-desktop-up {
-  @media (min-width: 1800px) { @content; }
-}
-*/
 
 
 /*
