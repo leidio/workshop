@@ -12,6 +12,7 @@ html {
   box-sizing: inherit;
 }
 
+
 body {
 	font-family: 'Work Sans', Roboto, Arial,sans-serif; /* 'Work Sans' */
 	margin:0;
@@ -220,6 +221,28 @@ R O C K S
 	transform: translateY(-200px);
 }
 
+
+
+/* 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+I M A G E   S W I T C H
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+*/
+
+.switch {
+   	width:100%;
+   	} 
+
+.switch div img{width:100%;}
+   
+.end{display:none;}
+    
+.switch:hover div.start{display:none;}
+.switch:hover div.end{display:block;}
+
+
 /* 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -282,7 +305,7 @@ P R O J E C T   T Y P E F A C E   T R E A T M E N T S   A N D   L I S T S
 .full {
   width:100%; /* content-box:60%; */
   padding:5% 20% 5% 20%;
-  height:auto;
+  /*height:auto;*/
 }
 
 .projectheadline {
@@ -347,6 +370,7 @@ P R O J E C T   T Y P E F A C E   T R E A T M E N T S   A N D   L I S T S
 .hide:hover span {
 	display:block;
 }
+
 
 .captionbox {
 	position: absolute;
@@ -417,6 +441,10 @@ V I S U A L S
 
 .notop {
 	padding-top:0;
+}
+
+.nobottom {
+    padding-bottom:0;
 }
 
 .top2 {
