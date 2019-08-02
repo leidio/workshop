@@ -416,7 +416,7 @@ V I S U A L S
 
 .border0 {
     width:100%;
-    overflow:hidden;
+    /*overflow:hidden;*/
     padding:5%;
 }
 
@@ -551,7 +551,7 @@ I M A G E   L A Y O U T   B O X   G R I D
 
 .grid_2h2v {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto;
   grid-gap:5px;
 }
