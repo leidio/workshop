@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Background Sketch</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #f6f5f0;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<script>
+let sampleStep = 6;
+
+let sampleStep = 6;
+
+let terrainScale = 0.0048;
+let terrainSpeed = 0.008;
+
+let palette = [];
+let regions = [];
+
+let reseedInterval = 360;
+let reseedClock = 0;
+
+// secondary grid / glyph system
+let cols = 42;
+let rows = 56;
+let margin = 22;
+
+let cellGlyphs = [];
+let nextGlyphs = [];
+
+let brailleGlyphs = [];
+
+function initializeBrailleGlyphs() {
+  brailleGlyphs = [];
+
+  for (let code = 0x2801; code <= 0x28FF; code++) {
+    brailleGlyphs.push(String.fromCharCode(code));
+  }
+}
+
+function setup() {
+  pixelDensity(1);
+  let c = createCanvas(900, 1200);
+  c.parent("p5-holder");
+  noStroke();
+  textAlign(CENTER, CENTER);
+  textFont("monospace");
+
+  palette = [
+    color(238, 239, 232),
+    color(30, 24, 58),
+    color(170, 255, 40),
+    color(0, 245, 255),
+    color(255, 40, 170)
+  ];
+
+  initializeBrailleGlyphs();
+  initializeRegions();
+  initializeGlyphGrid();
+}
+
+function draw() {
+  background(246, 245, 240);
+
+  updateRegions();
+  updateGlyphGrid();
+
+  drawTerrainBands();
+  drawContourField();
+  drawRegionEdges();
+  drawGlyphGrid();
+}
+
+function initializeRegions() {
+  regions = [];
+
+  for (let i = 0; i < 6; i++) {
+    regions.push(makeRegion(random(width), random(height)));
+  }
+}
+
+function makeRegion(x, y) {
+  let planeCount = floor(random(6, 11));
+  let planes = [];
+
+  for (let i = 0; i < planeCount; i++) {
+    planes.push({
+      angle: random(TWO_PI),
+      radius: random(0.45, 1.05),
+      weight: random(0.7, 1.3)
+    });
+  }
+
+  return {
+    x: x,
+    y: y,
+    vx: random(-0.22, 0.22),
+    vy: random(-0.22, 0.22),
+
+    radius: random(170, 310),
+    angle: random(TWO_PI),
+    angleSpeed: random(-0.0014, 0.0014),
+
+    wobble: random(8, 20),
+    phase: random(TWO_PI),
+    strength: random(0.45, 1.1),
+
+    terrace: floor(random(10, 22)),
+    terraceHeight: random(0.04, 0.085),
+
+    fillMode: floor(random(4)),
+    driftNoiseOffset: random(1000),
+
+    edgeJitter: random(0.08, 0.22),
+    planes: planes
+  };
+}
+
+function updateRegions() {
+  reseedClock++;
+
+  for (let i = 0; i < regions.length; i++) {
+    let r = regions[i];
+    let t = frameCount * 0.004;
+
+    let driftX = map(noise(r.driftNoiseOffset, t), 0, 1, -0.35, 0.35);
+    let driftY = map(noise(r.driftNoiseOffset + 100, t), 0, 1, -0.35, 0.35);
+
+    r.x += r.vx + driftX;
+    r.y += r.vy + driftY;
+    r.angle += r.angleSpeed + sin(t * 0.9 + r.phase) * 0.0008;
+
+    if (r.x < -260) r.x = width + 260;
+    if (r.x > width + 260) r.x = -260;
+    if (r.y < -260) r.y = height + 260;
+    if (r.y > height + 260) r.y = -260;
+  }
+
+  if (reseedClock > reseedInterval) {
+    reseedClock = 0;
+    let idx = floor(random(regions.length));
+    regions[idx] = makeRegion(random(width), random(height));
+  }
+}
+
+function drawTerrainBands() {
+  for (let y = 0; y < height; y += sampleStep) {
+    for (let x = 0; x < width; x += sampleStep) {
+      let base = terrainValue(x, y);
+      let modify = interventionValue(x, y);
+      let v = base + modify.delta;
+
+      let c = terrainColor(x, y, v, modify);
+      fill(c);
+      rect(x, y, sampleStep + 1, sampleStep + 1);
+    }
+  }
+}
+
+function drawContourField() {
+  noFill();
+
+  for (let y = 0; y < height; y += 9) {
+    beginShape();
+
+    for (let x = 0; x < width; x += 6) {
+      let base = terrainValue(x, y);
+      let modify = interventionValue(x, y);
+      let v = base + modify.delta;
+
+      let contourY = y + map(v, -1.4, 1.4, -42, 42);
+
+      if (modify.terraceInfluence > 0.05) {
+        contourY = quantize(
+          contourY,
+          map(modify.terraceInfluence, 0.05, 1, 10, 3)
+        );
+      }
+
+      let motion = deformationMotion(x, y);
+
+      let alpha = map(modify.edge + modify.regionInfluence, 0, 1.8, 16, 72);
+      alpha += map(motion, 0, 1, 0, 55);
+
+      let weight = map(modify.edge, 0, 1, 0.28, 0.85);
+      weight += map(motion, 0, 1, 0.0, 1.35);
+
+      stroke(18, constrain(alpha, 0, 140));
+      strokeWeight(constrain(weight, 0.2, 1.9));
+
+      curveVertex(x, contourY);
+    }
+
+    endShape();
+  }
+}
+
+function drawRegionEdges() {
+  noFill();
+
+  for (let y = 0; y < height; y += 10) {
+    let drawing = false;
+
+    for (let x = 0; x < width; x += 4) {
+      let modify = interventionValue(x, y);
+
+      if (modify.edge > 0.08) {
+        if (!drawing) {
+          beginShape();
+          drawing = true;
+        }
+
+        let offset = map(modify.edge, 0, 1, 0, 11);
+        stroke(10, map(modify.edge, 0, 1, 40, 165));
+        strokeWeight(map(modify.edge, 0, 1, 0.6, 2.1));
+        vertex(x, y + offset);
+      } else if (drawing) {
+        endShape();
+        drawing = false;
+      }
+    }
+
+    if (drawing) {
+      endShape();
+    }
+  }
+}
+
+function initializeGlyphGrid() {
+  for (let row = 0; row < rows; row++) {
+    cellGlyphs[row] = [];
+    nextGlyphs[row] = [];
+
+    for (let col = 0; col < cols; col++) {
+      let g = randomBrailleGlyph();
+      cellGlyphs[row][col] = g;
+      nextGlyphs[row][col] = g;
+    }
+  }
+}
+
+function updateGlyphGrid() {
+  if (frameCount % 4 !== 0) {
+    return;
+  }
+
+  let xStep = (width - margin * 2) / cols;
+  let yStep = (height - margin * 2) / rows;
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      let x = margin + (col + 0.5) * xStep;
+      let y = margin + (row + 0.5) * yStep;
+
+      let modify = interventionValue(x, y);
+      let motion = glyphMotion(row, col);
+
+      let active = constrain(
+        modify.regionInfluence * 0.75 + modify.edge * 1.1 + motion * 0.45,
+        0,
+        1
+      );
+
+      if (active > 0.58) {
+        nextGlyphs[row][col] = copyGlyphFromNeighbor(row, col);
+      } else {
+        let mutationChance = map(active, 0, 0.58, 0.16, 0.015);
+        if (random() < mutationChance) {
+          nextGlyphs[row][col] = brailleGlyphForCell(x, y, modify);
+        } else {
+          nextGlyphs[row][col] = cellGlyphs[row][col];
+        }
+      }
+    }
+  }
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      cellGlyphs[row][col] = nextGlyphs[row][col];
+    }
+  }
+}
+
+function drawGlyphGrid() {
+  let xStep = (width - margin * 2) / cols;
+  let yStep = (height - margin * 2) / rows;
+
+  rectMode(CENTER);
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      let baseX = margin + (col + 0.5) * xStep;
+      let baseY = margin + (row + 0.5) * yStep;
+
+      let p = deformPoint(baseX, baseY);
+      let modify = interventionValue(baseX, baseY);
+      let motion = glyphMotion(row, col);
+      let localDelta = glyphStress(row, col);
+
+      let frameAlpha = map(
+        modify.regionInfluence + modify.edge,
+        0,
+        1.4,
+        8,
+        34
+      );
+
+      stroke(0, frameAlpha);
+      strokeWeight(0.28);
+      noFill();
+      rect(p.x, p.y, xStep * 0.95, yStep * 0.95);
+
+      let glyphSizeMin = min(xStep, yStep) * 0.42;
+      let glyphSizeMax = min(xStep, yStep) * 0.9;
+      let glyphSize = map(
+        constrain(localDelta + motion * 0.7 + modify.edge * 0.5, 0, 1),
+        0,
+        1,
+        glyphSizeMin,
+        glyphSizeMax
+      );
+
+      let alpha = map(
+        modify.regionInfluence + modify.edge + motion,
+        0,
+        2.0,
+        16,
+        110
+      );
+
+      noStroke();
+      fill(15, alpha);
+      textSize(glyphSize);
+      text(cellGlyphs[row][col], p.x, p.y);
+    }
+  }
+}
+
+function brailleGlyphForCell(x, y, modify) {
+  let t = frameCount * 0.035;
+  let a = noise(x * 0.03, y * 0.03, t + modify.fillPhase);
+  let b = noise(x * 0.08 + 200, y * 0.08 + 200, t * 1.3);
+  let c = noise(x * 0.18 + 500, y * 0.18 + 500, t * 2.1);
+
+  let val = constrain(
+    a * 0.45 +
+    b * 0.35 +
+    c * 0.2 +
+    modify.regionInfluence * 0.18 +
+    modify.edge * 0.22,
+    0,
+    1
+  );
+
+  let idx = floor(val * (brailleGlyphs.length - 1));
+  idx = constrain(idx, 0, brailleGlyphs.length - 1);
+
+  return brailleGlyphs[idx];
+}
+
+function randomBrailleGlyph() {
+  return random(brailleGlyphs);
+}
+
+function glyphMotion(row, col) {
+  let xStep = (width - margin * 2) / cols;
+  let yStep = (height - margin * 2) / rows;
+
+  let x = margin + (col + 0.5) * xStep;
+  let y = margin + (row + 0.5) * yStep;
+
+  let p = deformPoint(x, y);
+  let dx = p.x - x;
+  let dy = p.y - y;
+  let d = sqrt(dx * dx + dy * dy);
+
+  return constrain(d / 14, 0, 1);
+}
+
+function glyphStress(row, col) {
+  return 0;
+}
+
+function copyGlyphFromNeighbor(row, col) {
+  let neighbors = getGlyphNeighbors(row, col);
+
+  if (neighbors.length === 0) {
+    return cellGlyphs[row][col];
+  }
+
+  let counts = {};
+
+  for (let i = 0; i < neighbors.length; i++) {
+    let n = neighbors[i];
+    let ch = cellGlyphs[n.row][n.col];
+    if (!counts[ch]) {
+      counts[ch] = 0;
+    }
+    counts[ch]++;
+  }
+
+  let best = cellGlyphs[row][col];
+  let bestCount = -1;
+
+  for (let key in counts) {
+    if (counts[key] > bestCount) {
+      bestCount = counts[key];
+      best = key;
+    }
+  }
+
+  return best;
+}
+
+function getGlyphNeighbors(row, col) {
+  let neighbors = [];
+
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      if (dx === 0 && dy === 0) continue;
+
+      let nr = row + dy;
+      let nc = col + dx;
+
+      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+        neighbors.push({ row: nr, col: nc });
+      }
+    }
+  }
+
+  return neighbors;
+}
+
+function deformPoint(x, y) {
+  let t = frameCount * 0.018;
+  let base = terrainValue(x, y);
+  let modify = interventionValue(x, y);
+
+  let dx =
+    sin(y * 0.018 + t * 2.1) * 2.0 +
+    cos((x + y) * 0.007 + t * 1.4) * 1.4 +
+    modify.delta * 5.2;
+
+  let dy =
+    cos(x * 0.018 - t * 1.8) * 2.0 +
+    sin((x - y) * 0.007 + t * 1.1) * 1.4 +
+    base * 2.2 +
+    modify.edge * 3.4;
+
+  return {
+    x: x + dx,
+    y: y + dy
+  };
+}
+
+function terrainValue(x, y) {
+  let t = frameCount * terrainSpeed;
+
+  let n1 = noise(x * terrainScale, y * terrainScale, t);
+  let n2 = noise(x * terrainScale * 2.4 + 100, y * terrainScale * 2.4 + 100, t * 0.85);
+  let n3 = noise(x * terrainScale * 0.8 + 300, y * terrainScale * 0.8 + 300, t * 0.42);
+
+  let wave1 = sin(x * 0.009 + t * 2.2) * 0.22;
+  let wave2 = cos(y * 0.011 - t * 1.8) * 0.16;
+  let wave3 = sin((x + y) * 0.0048 + t * 1.35) * 0.12;
+
+  let v = map(n1, 0, 1, -0.58, 0.58)
+        + map(n2, 0, 1, -0.3, 0.3)
+        + map(n3, 0, 1, -0.22, 0.22)
+        + wave1
+        + wave2
+        + wave3;
+
+  return constrain(v, -1, 1);
+}
+
+function interventionValue(x, y) {
+  let best1 = null;
+  let best2 = null;
+
+  for (let i = 0; i < regions.length; i++) {
+    let s = regionSample(x, y, regions[i]);
+
+    if (!best1 || s.influence > best1.influence) {
+      best2 = best1;
+      best1 = s;
+    } else if (!best2 || s.influence > best2.influence) {
+      best2 = s;
+    }
+  }
+
+  if (!best1) {
+    return {
+      delta: 0,
+      edge: 0,
+      trace: 0,
+      terraceInfluence: 0,
+      fillInfluence: 0,
+      fillMode: 0,
+      fillPhase: 0,
+      regionInfluence: 0
+    };
+  }
+
+  let primary = best1;
+  let secondary = best2 ? best2 : best1;
+
+  let competition = constrain(1 - abs(primary.influence - secondary.influence), 0, 1);
+
+  let regionInfluence = primary.influence;
+  let edge = max(primary.edgeBand, competition * 0.6);
+
+  let delta =
+    primary.facetedValue * primary.region.strength * primary.influence * 2.2 +
+    secondary.facetedValue * secondary.region.strength * secondary.influence * 0.3;
+
+  let terraceInfluence = primary.influence;
+  let fillInfluence = max(primary.influence, secondary.influence * 0.45);
+  let trace = max(edge, primary.influence * 0.75);
+
+  return {
+    delta: delta,
+    edge: edge,
+    trace: trace,
+    terraceInfluence: terraceInfluence,
+    fillInfluence: fillInfluence,
+    fillMode: primary.region.fillMode,
+    fillPhase: primary.region.phase,
+    regionInfluence: regionInfluence
+  };
+}
+
+function regionSample(x, y, r) {
+  let t = frameCount * 0.006;
+
+  let cx = r.x + sin(t * 0.8 + r.phase) * r.wobble;
+  let cy = r.y + cos(t * 0.7 + r.phase) * r.wobble * 0.65;
+
+  let px = x - cx;
+  let py = y - cy;
+
+  let ca = cos(r.angle);
+  let sa = sin(r.angle);
+
+  // rotate into local regional space
+  let lx = px * ca - py * sa;
+  let ly = px * sa + py * ca;
+
+  // broad anisotropic scaling so each region has directional character
+  let sx = lx / (r.radius * 1.0);
+  let sy = ly / (r.radius * 0.82);
+
+  // irregular faceted envelope from many planes
+  let maxPlane = -999999;
+  let minPlane = 999999;
+
+  for (let i = 0; i < r.planes.length; i++) {
+    let p = r.planes[i];
+
+    let a = p.angle + sin(t * 0.45 + r.phase + i * 0.7) * 0.08;
+    let nx = cos(a);
+    let ny = sin(a);
+
+    let rr =
+      p.radius *
+      (1.0 + map(noise(i * 13.1 + r.edgeJitter, t * 0.5 + r.phase), 0, 1, -0.12, 0.12));
+
+    let plane = (sx * nx + sy * ny) - rr;
+    plane *= p.weight;
+
+    if (plane > maxPlane) maxPlane = plane;
+    if (plane < minPlane) minPlane = plane;
+  }
+
+  // signed faceted body
+  let d = maxPlane;
+
+  // broad body / shoulder
+  let influence = 1.0 - smoothstep(-0.08, 0.22, d);
+  influence = constrain(influence, 0, 1);
+
+  // terraced interior depth
+  let interiorDepth = max(0, -d);
+  let stepped = floor(interiorDepth * r.terrace) * r.terraceHeight;
+
+  // secondary regional cutting planes for constructed-terrain feel
+  let cut1 = quantize((sx * 0.95 + sy * 0.35), 0.16) * 0.22;
+  let cut2 = quantize((sx * -0.3 + sy * 1.1), 0.22) * 0.16;
+
+  // subtle internal modulation, but still geometric
+  let regionalWarp =
+    map(noise(sx * 2.4 + 100, sy * 2.4 + 100, t * 0.45 + r.phase), 0, 1, -0.08, 0.08);
+
+  let edgeBand = 1.0 - smoothstep(0.0, 0.06, abs(d));
+
+  return {
+    influence: influence,
+    facetedValue: stepped + cut1 + cut2 + regionalWarp,
+    edgeBand: edgeBand,
+    signedDistance: d,
+    region: r
+  };
+}
+
+function terrainColor(x, y, v, modify) {
+  let offWhite = palette[0];
+  let deep = palette[1];
+  let acid = palette[2];
+  let cyan = palette[3];
+  let magenta = palette[4];
+
+  let t = frameCount * 0.004;
+
+  let nGround = noise(x * 0.012, y * 0.012, t);
+  let nSoft = noise(x * 0.004 + 500, y * 0.004 + 500, t * 0.6);
+
+  let base = lerpColor(offWhite, color(224, 233, 229), nGround * 0.55);
+  base = lerpColor(base, color(245, 245, 241), nSoft * 0.14);
+
+  let band = floor(map(v, -1.2, 1.2, 0, 9));
+  band = constrain(band, 0, 9);
+
+  if (band === 2 || band === 5) base = lerpColor(base, cyan, 0.05);
+  if (band === 6 || band === 7) base = lerpColor(base, acid, 0.045);
+
+  if (modify.fillInfluence > 0.01) {
+    let noisy = materialNoiseColor(
+      x,
+      y,
+      modify.fillMode,
+      modify.fillPhase,
+      modify.regionInfluence
+    );
+    base = lerpColor(base, noisy, constrain(modify.fillInfluence * 1.3, 0, 1));
+  }
+
+  return color(red(base), green(base), blue(base), 236);
+}
+
+function materialNoiseColor(x, y, fillMode, fillPhase, influence) {
+  let offWhite = palette[0];
+  let deep = palette[1];
+  let acid = palette[2];
+  let cyan = palette[3];
+  let magenta = palette[4];
+
+  let t = frameCount * 0.0025;
+
+  // larger regional fields
+  let cloud = noise(x * 0.0035, y * 0.0035, t + fillPhase);
+  let fieldA = noise(x * 0.007 + 100, y * 0.007 + 100, t * 0.7 + fillPhase);
+  let fieldB = noise(x * 0.0055 + 300, y * 0.0055 + 300, t * 0.55 + fillPhase);
+  let fieldC = noise(x * 0.010 + 800, y * 0.010 + 800, t * 0.85 + fillPhase);
+
+  let c;
+
+  if (fillMode === 0) {
+    c = lerpColor(deep, acid, fieldA);
+    c = lerpColor(c, offWhite, cloud * 0.12);
+    c = lerpColor(c, deep, map(fieldB, 0.62, 1, 0, 0.28, true));
+  } else if (fillMode === 1) {
+    c = lerpColor(cyan, magenta, fieldA);
+    c = lerpColor(c, offWhite, cloud * 0.08);
+    c = lerpColor(c, deep, map(fieldC, 0.58, 1, 0, 0.34, true));
+  } else if (fillMode === 2) {
+    c = lerpColor(acid, cyan, fieldB);
+    c = lerpColor(c, offWhite, cloud * 0.1);
+    c = lerpColor(c, deep, map(fieldA, 0.7, 1, 0, 0.22, true));
+  } else {
+    c = lerpColor(offWhite, acid, cloud);
+    c = lerpColor(c, cyan, fieldB * 0.18);
+    c = lerpColor(c, deep, map(fieldC, 0.62, 1, 0, 0.26, true));
+  }
+
+  // very fine, dense particulate grain
+  let g1 = centeredHash(x * 23.0 + 11.1, y * 23.0 + 7.3);
+  let g2 = centeredHash(x * 41.0 + 91.7, y * 39.0 + 19.4);
+  let g3 = centeredHash(x * 79.0 + 133.4, y * 73.0 + 88.6);
+  let g4 = centeredHash(x * 149.0 + 17.8, y * 151.0 + 220.2);
+
+  let grain = g1 * 0.38 + g2 * 0.27 + g3 * 0.21 + g4 * 0.14;
+
+  let rr = red(c);
+  let gg = green(c);
+  let bb = blue(c);
+
+  // photographic-style luminance grain
+  rr += grain * 16;
+  gg += grain * 16;
+  bb += grain * 16;
+
+  // pigment speckle rides inside larger fields
+  let fieldMaskA = pow(fieldA, 2.0) * influence;
+  let fieldMaskB = pow(fieldB, 2.2) * influence;
+  let fieldMaskC = pow(fieldC, 2.6) * influence;
+
+  let spark1 = max(0, g2) * fieldMaskA * 34;
+  let spark2 = max(0, -g3) * fieldMaskB * 28;
+  let spark3 = max(0, g4) * fieldMaskC * 22;
+
+  if (fillMode === 0 || fillMode === 2) {
+    gg += spark1;
+    rr += spark3 * 0.5;
+    bb += spark2 * 0.35;
+  } else if (fillMode === 1) {
+    bb += spark1;
+    rr += spark2;
+    gg += spark3 * 0.28;
+  } else {
+    gg += spark1 * 0.8;
+    bb += spark3 * 0.7;
+  }
+
+  rr = constrain(rr, 0, 255);
+  gg = constrain(gg, 0, 255);
+  bb = constrain(bb, 0, 255);
+
+  c = color(rr, gg, bb);
+  c = lerpColor(offWhite, c, constrain(influence * 1.15, 0, 1));
+
+  return c;
+}
+
+function randomGrain(x, y, t) {
+  let g1 = centeredHash(x * 13.0 + t * 10.0, y * 13.0 + t * 7.0);
+  let g2 = centeredHash(x * 27.0 + 200.0, y * 29.0 + 300.0);
+  let g3 = centeredHash(x * 57.0 + 500.0, y * 53.0 + 700.0);
+
+  return constrain(0.5 + g1 * 0.35 + g2 * 0.22 + g3 * 0.13, 0, 1);
+}
+
+function quantize(v, step) {
+  return round(v / step) * step;
+}
+
+function ease(v) {
+  return v * v * (3 - 2 * v);
+}
+
+function smoothstep(edge0, edge1, x) {
+  let t = constrain((x - edge0) / (edge1 - edge0), 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+function hash2(x, y) {
+  let n = sin(x * 127.1 + y * 311.7) * 43758.5453123;
+  return n - floor(n);
+}
+
+function centeredHash(x, y) {
+  return hash2(x, y) - 0.5;
+}
+
+function deformationMotion(x, y) {
+  let t = frameCount * 0.008;
+
+  let v1 = terrainValue(x, y);
+  let v2 = terrainValue(
+    x + sin(t + x * 0.002) * 6,
+    y + cos(t + y * 0.002) * 6
+  );
+
+  let modify = interventionValue(x, y);
+
+  let localShift = abs(v2 - v1);
+  let regionShift = abs(modify.delta) * 0.22 + modify.edge * 0.55;
+
+  return constrain(localShift * 2.2 + regionShift, 0, 1);
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  pixelDensity(1);
+}
+
+function draw() {
+  background(246, 245, 240);
+
+  // your drawing code here
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+</script>
+</body>
+</html>
