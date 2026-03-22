@@ -55,8 +55,9 @@ function initializeBrailleGlyphs() {
 
 function setup() {
   pixelDensity(1);
-  let c = createCanvas(900, 1200);
-  c.parent("p5-holder");
+
+  createCanvas(windowWidth, windowHeight); // ← THIS is the key change
+
   noStroke();
   textAlign(CENTER, CENTER);
   textFont("monospace");
@@ -74,6 +75,10 @@ function setup() {
   initializeGlyphGrid();
 }
 
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+  
 function draw() {
   background(246, 245, 240);
 
