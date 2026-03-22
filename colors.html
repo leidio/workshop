@@ -1,0 +1,423 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    body { margin: 0; }
+  </style>
+</head>
+<body>
+<script>
+
+let cols = 42;
+let rows = 42;
+let margin = 50;
+
+let fieldScale = 0.016;
+let motionScale = 0.02;
+let breakScale = 0.035;
+
+let maxOffset = 10;
+let breakThreshold = 0.5;
+
+let glyphs = ["*", "/", '"'];
+
+let cellChars = [];
+let nextChars = [];
+
+let palette = [];
+
+// regeneration state
+let stateA;
+let stateB;
+let regenDuration = 360;
+let regenClock = 0;
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  textAlign(CENTER, CENTER);
+  textFont("Courier New");
+  rectMode(CENTER);
+
+  palette = [
+    color(0, 255, 170),
+    color(0, 220, 255),
+    color(180, 255, 0),
+    color(255, 245, 0)
+  ];
+
+  initializeCells();
+
+  stateA = generateFieldState();
+  stateB = generateFieldState();
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+function draw() {
+  background(255);
+
+  updateRegeneration();
+  updateCells();
+  drawCellGrid();
+}
+
+function initializeCells() {
+  for (let row = 0; row < rows; row++) {
+    cellChars[row] = [];
+    nextChars[row] = [];
+
+    for (let col = 0; col < cols; col++) {
+      cellChars[row][col] = randomGlyph();
+      nextChars[row][col] = cellChars[row][col];
+    }
+  }
+}
+
+function updateRegeneration() {
+  regenClock++;
+
+  if (regenClock >= regenDuration) {
+    regenClock = 0;
+    stateA = stateB;
+    stateB = generateFieldState();
+  }
+}
+
+function regenerationProgress() {
+  let t = regenClock / regenDuration;
+
+  // smoother than linear; gives more "bloom"
+  return easeInOutCubic(t);
+}
+
+function generateFieldState() {
+  return {
+    waveAmpX: random(1.2, 4.8),
+    waveAmpY: random(1.2, 4.8),
+    waveFreqX: random(0.7, 1.8),
+    waveFreqY: random(0.7, 1.8),
+    phaseSpeedX: random(0.5, 1.8),
+    phaseSpeedY: random(0.5, 1.8),
+    bloomScale: random(0.6, 1.6),
+    washBias: random(0, 1),
+    whiteBias: random(0.2, 0.8),
+    glyphBias: floor(random(glyphs.length))
+  };
+}
+
+function drawCellGrid() {
+  let yStep = (height - margin * 2) / rows;
+  let xStep = (width - margin * 2) / cols;
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      let x = margin + (col + 0.5) * xStep;
+      let y = margin + (row + 0.5) * yStep;
+
+      let p = deformPoint(x, y);
+      let motion = cellMotion(row, col);
+      let localDelta = localStressDifference(row, col);
+
+      drawCellWash(p.x, p.y, xStep, yStep, motion, localDelta, row, col);
+
+      let minSize = min(xStep, yStep) * 0.42;
+      let maxSize = min(xStep, yStep) * 0.98;
+
+      let bloomFactor = bloomingValue(row, col);
+      let glyphSize = map(localDelta + bloomFactor * 0.2, 0, 0.45, minSize, maxSize);
+      glyphSize = constrain(glyphSize, minSize, maxSize);
+
+      let glyphAlpha = map(motion, 0, 1, 70, 180);
+      glyphAlpha += bloomFactor * 40;
+      glyphAlpha = constrain(glyphAlpha, 50, 220);
+
+      stroke(0, 10);
+      strokeWeight(0.35);
+      noFill();
+      rect(p.x, p.y, xStep * 0.9, yStep * 0.9);
+
+      noStroke();
+      fill(0, glyphAlpha);
+      textSize(glyphSize);
+      text(cellChars[row][col], p.x, p.y);
+    }
+  }
+}
+
+function drawCellWash(x, y, xStep, yStep, motion, localDelta, row, col) {
+  let washColor = cellWashColor(motion, localDelta, row, col);
+  let whiteFactor = cellWhiteFactor(motion, localDelta, row, col);
+
+  let finalColor = lerpColor(washColor, color(255), whiteFactor);
+
+  noStroke();
+
+  for (let i = 0; i < 4; i++) {
+    let inset = i * 1.6;
+    let alpha = map(i, 0, 3, 34, 8);
+
+    fill(
+      red(finalColor),
+      green(finalColor),
+      blue(finalColor),
+      alpha
+    );
+
+    rect(
+      x,
+      y,
+      xStep * 0.9 - inset,
+      yStep * 0.9 - inset
+    );
+  }
+}
+
+function cellWashColor(motion, localDelta, row, col) {
+  let bloom = bloomingValue(row, col);
+  let progress = regenerationProgress();
+
+  let energy = constrain((motion * 0.55) + (localDelta * 1.4) + (bloom * 0.6), 0, 1);
+
+  let c1 = palette[0];
+  let c2 = palette[1];
+  let c3 = palette[2];
+  let c4 = palette[3];
+
+  let blended;
+
+  if (energy < 0.33) {
+    blended = lerpColor(c1, c2, map(energy, 0, 0.33, 0, 1));
+  } else if (energy < 0.66) {
+    blended = lerpColor(c2, c3, map(energy, 0.33, 0.66, 0, 1));
+  } else {
+    blended = lerpColor(c3, c4, map(energy, 0.66, 1, 0, 1));
+  }
+
+  // make transition moments feel brighter
+  let bloomAlphaBoost = sin(progress * PI) * 40;
+  let alpha = map(motion, 0, 1, 30, 80) + bloomAlphaBoost;
+
+  return color(
+    red(blended),
+    green(blended),
+    blue(blended),
+    constrain(alpha, 18, 120)
+  );
+}
+
+function cellWhiteFactor(motion, localDelta, row, col) {
+  let progress = regenerationProgress();
+  let bloom = bloomingValue(row, col);
+
+  // whiten more strongly at regeneration crest
+  let crest = sin(progress * PI);
+  let calmness = 1 - motion;
+
+  let whiten = calmness * 0.35 + bloom * 0.35 + crest * 0.5;
+  whiten = constrain(whiten, 0, 1);
+
+  let bias = lerp(stateA.whiteBias, stateB.whiteBias, progress);
+  return map(constrain(whiten, bias, 1), bias, 1, 0, 1);
+}
+
+function bloomingValue(row, col) {
+  let xNorm = col / max(1, cols - 1);
+  let yNorm = row / max(1, rows - 1);
+
+  let progress = regenerationProgress();
+  let t = frameCount * motionScale * 0.6;
+
+  let bloomA =
+    sin((xNorm * stateA.waveFreqX * TWO_PI) + t * stateA.phaseSpeedX) *
+    cos((yNorm * stateA.waveFreqY * TWO_PI) - t * stateA.phaseSpeedY);
+
+  let bloomB =
+    sin((xNorm * stateB.waveFreqX * TWO_PI) + t * stateB.phaseSpeedX) *
+    cos((yNorm * stateB.waveFreqY * TWO_PI) - t * stateB.phaseSpeedY);
+
+  let bloom = lerp(bloomA * stateA.bloomScale, bloomB * stateB.bloomScale, progress);
+  bloom = map(bloom, -1, 1, 0, 1);
+
+  return bloom;
+}
+
+function updateCells() {
+  let progress = regenerationProgress();
+  let crest = sin(progress * PI);
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      let motion = cellMotion(row, col);
+      let bloom = bloomingValue(row, col);
+
+      // during regeneration crest, the system becomes more willing to reorganize
+      let imitationThreshold = lerp(0.58, 0.42, crest);
+      let mutationBoost = lerp(1.0, 2.2, crest);
+
+      if (motion + bloom * 0.2 > imitationThreshold) {
+        nextChars[row][col] = copyFromNeighbor(row, col);
+      } else {
+        let mutationChance = map(motion, 0, 0.58, 0.08, 0.01) * mutationBoost;
+
+        if (random() < mutationChance) {
+          nextChars[row][col] = biasedRandomGlyph(progress);
+        } else {
+          nextChars[row][col] = cellChars[row][col];
+        }
+      }
+    }
+  }
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      cellChars[row][col] = nextChars[row][col];
+    }
+  }
+}
+
+function biasedRandomGlyph(progress) {
+  let biasIndex = floor(lerp(stateA.glyphBias, stateB.glyphBias, progress)) % glyphs.length;
+
+  if (random() < 0.45) {
+    return glyphs[biasIndex];
+  }
+
+  return random(glyphs);
+}
+
+function cellMotion(row, col) {
+  let yStep = (height - margin * 2) / rows;
+  let xStep = (width - margin * 2) / cols;
+
+  let x = margin + (col + 0.5) * xStep;
+  let y = margin + (row + 0.5) * yStep;
+
+  let p = deformPoint(x, y);
+
+  let dx = p.x - x;
+  let dy = p.y - y;
+  let d = sqrt(dx * dx + dy * dy);
+
+  return constrain(d / maxOffset, 0, 1);
+}
+
+function localStressDifference(row, col) {
+  let m = cellMotion(row, col);
+  let neighbors = getNeighbors(row, col);
+
+  if (neighbors.length === 0) {
+    return 0;
+  }
+
+  let sum = 0;
+
+  for (let n of neighbors) {
+    let nm = cellMotion(n.row, n.col);
+    sum += abs(m - nm);
+  }
+
+  return sum / neighbors.length;
+}
+
+function copyFromNeighbor(row, col) {
+  let neighbors = getNeighbors(row, col);
+
+  if (neighbors.length === 0) {
+    return cellChars[row][col];
+  }
+
+  let counts = {};
+
+  for (let n of neighbors) {
+    let ch = cellChars[n.row][n.col];
+
+    if (!counts[ch]) {
+      counts[ch] = 0;
+    }
+
+    counts[ch]++;
+  }
+
+  let bestChar = cellChars[row][col];
+  let bestCount = -1;
+
+  for (let ch in counts) {
+    if (counts[ch] > bestCount) {
+      bestCount = counts[ch];
+      bestChar = ch;
+    }
+  }
+
+  return bestChar;
+}
+
+function getNeighbors(row, col) {
+  let neighbors = [];
+
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      if (dx === 0 && dy === 0) {
+        continue;
+      }
+
+      let nr = row + dy;
+      let nc = col + dx;
+
+      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+        neighbors.push({ row: nr, col: nc });
+      }
+    }
+  }
+
+  return neighbors;
+}
+
+function randomGlyph() {
+  return random(glyphs);
+}
+
+function deformPoint(x, y) {
+  let progress = regenerationProgress();
+  let t = frameCount * motionScale;
+
+  let waveAX = sin(y * fieldScale * stateA.waveFreqY + t * stateA.phaseSpeedY) * stateA.waveAmpX;
+  let waveAY = cos(x * fieldScale * stateA.waveFreqX - t * stateA.phaseSpeedX) * stateA.waveAmpY;
+
+  let waveBX = sin(y * fieldScale * stateB.waveFreqY + t * stateB.phaseSpeedY) * stateB.waveAmpX;
+  let waveBY = cos(x * fieldScale * stateB.waveFreqX - t * stateB.phaseSpeedX) * stateB.waveAmpY;
+
+  let dx = lerp(waveAX, waveBX, progress);
+  let dy = lerp(waveAY, waveBY, progress);
+
+  // gentle blooming expansion / contraction over whole field
+  let cx = width * 0.5;
+  let cy = height * 0.5;
+
+  let vx = x - cx;
+  let vy = y - cy;
+  let d = sqrt(vx * vx + vy * vy) + 0.0001;
+
+  let bloomStrength = sin(progress * PI) * 4.0;
+  dx += (vx / d) * bloomStrength * 0.35;
+  dy += (vy / d) * bloomStrength * 0.35;
+
+  return {
+    x: x + constrain(dx, -maxOffset, maxOffset),
+    y: y + constrain(dy, -maxOffset, maxOffset)
+  };
+}
+
+function easeInOutCubic(t) {
+  if (t < 0.5) {
+    return 4 * t * t * t;
+  }
+  return 1 - pow(-2 * t + 2, 3) / 2;
+}
+
+</script>
+</body>
+</html>
