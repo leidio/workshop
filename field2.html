@@ -216,7 +216,7 @@ function drawTerrainBands() {
 
       let c = terrainColor(x, y, v, modify);
       fill(c);
-      rect(x, y, sampleStep + 1, sampleStep + 1);
+      rect(x, y, sampleStep + 0.5, sampleStep + 0.5);
     }
   }
 }
@@ -406,6 +406,10 @@ function terrainColor(x, y, v, modify) {
   let paleGround = palette[1];
   let cyan = palette[2];
   let yellow = palette[3];
+  let indigo = palette[4];
+  let lavender = palette[5];
+  let ochre = palette[6];
+  let blueGreen = palette[7];
 
   let nGround = noise(x * 0.03, y * 0.03, frameCount * 0.012);
   let nFine = noise(x * 0.09 + 500, y * 0.09 + 500, frameCount * 0.018);
@@ -413,23 +417,35 @@ function terrainColor(x, y, v, modify) {
   let base = lerpColor(offWhite, paleGround, map(nGround, 0, 1, 0.1, 0.85));
   base = lerpColor(base, color(250, 248, 239), nFine * 0.2);
 
-  let band = floor(map(v, -1, 1, 0, 7));
-  band = constrain(band, 0, 7);
+  let band = floor(map(v, -1, 1, 0, 9));
+  band = constrain(band, 0, 9);
 
   if (band === 2 || band === 4) {
-    base = lerpColor(base, cyan, 0.16);
+    base = lerpColor(base, cyan, 0.14);
   }
   if (band === 5) {
-    base = lerpColor(base, yellow, 0.14);
+    base = lerpColor(base, yellow, 0.12);
+  }
+  if (band === 6) {
+    base = lerpColor(base, ochre, 0.10);
+  }
+  if (band === 7) {
+    base = lerpColor(base, lavender, 0.08);
   }
 
   if (modify.fillInfluence > 0.01) {
     let noisy = materialNoiseColor(x, y, modify.fillMode, modify.fillPhase, modify.regionInfluence);
-    base = lerpColor(base, noisy, constrain(modify.fillInfluence * 1.5, 0, 1));
+    base = lerpColor(base, noisy, constrain(modify.fillInfluence * 1.25, 0, 1));
   }
 
   let wash = noise(x * 0.01 + 800, y * 0.01 + 800, frameCount * 0.012);
-  base = lerpColor(base, color(255), map(wash, 0.93, 1, 0, 0.12));
+  base = lerpColor(base, color(255), map(wash, 0.93, 1, 0, 0.10));
+  base = lerpColor(base, color(255), 0.05);
+
+  // subtle extra palette participation
+  let accentField = noise(x * 0.006 + 1200, y * 0.006 + 1200, frameCount * 0.008);
+  base = lerpColor(base, blueGreen, map(accentField, 0.75, 1, 0, 0.08, true));
+  base = lerpColor(base, indigo, map(accentField, 0.0, 0.18, 0.05, 0, true));
 
   return color(red(base), green(base), blue(base), 236);
 }
@@ -448,12 +464,39 @@ function materialNoiseColor(x, y, fillMode, fillPhase, influence) {
   let paleGround = palette[1];
   let cyan = palette[2];
   let yellow = palette[3];
+  let indigo = palette[4];
+  let lavender = palette[5];
+  let ochre = palette[6];
+  let blueGreen = palette[7];
 
   if (fillMode === 0) {
     let stepped = floor(energy * 8) / 7;
     let c = lerpColor(cyan, yellow, stepped);
-    return lerpColor(c, offWhite, n3 * 0.24);
+    c = lerpColor(c, blueGreen, n2 * 0.18);
+    return lerpColor(c, offWhite, n3 * 0.22);
   }
+
+  if (fillMode === 1) {
+    let stripes = sin((x * 0.1 + y * 0.045) + t * 4.5 + fillPhase);
+    let mix = map(stripes, -1, 1, 0, 1);
+    let c = lerpColor(offWhite, cyan, mix);
+    c = lerpColor(c, lavender, n3 * 0.14);
+    return lerpColor(c, yellow, n2 * 0.24);
+  }
+
+  if (fillMode === 2) {
+    let q = quantize(energy, 0.12);
+    let c = lerpColor(paleGround, cyan, q);
+    c = lerpColor(c, ochre, n2 * 0.16);
+    return lerpColor(c, yellow, n1 * 0.18);
+  }
+
+  let rings = sin((x * 0.045 + y * 0.04) + t * 2.8 + fillPhase);
+  let mix = map(rings, -1, 1, 0, 1);
+  let c = lerpColor(offWhite, yellow, mix);
+  c = lerpColor(c, blueGreen, n2 * 0.24);
+  return lerpColor(c, indigo, map(n3, 0.8, 1, 0, 0.10, true));
+}
 
   if (fillMode === 1) {
     let stripes = sin((x * 0.1 + y * 0.045) + t * 4.5 + fillPhase);
