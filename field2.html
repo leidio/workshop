@@ -4,8 +4,17 @@
   <meta charset="utf-8">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
   <style>
-    body { margin: 0; }
-  </style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #f6f5f0;
+    }
+    canvas {
+      display: block;
+    }
+</style>
+
 </head>
 <body>
 <script>
@@ -26,20 +35,29 @@ let cacheCols = 0;
 let cacheRows = 0;
 
 function setup() {
-  createCanvas(900, 1200);
+  pixelDensity(1);
+
+  let c = createCanvas(windowWidth, windowHeight);
+  c.parent(document.body); // or just omit this line
+
   noStroke();
 
   palette = [
-    color(238, 239, 232), // off-white
-    color(220, 232, 225), // pale ground
-    color(140, 242, 226), // cyan
-    color(232, 236, 90)   // yellow
+    color(238, 239, 232),
+    color(220, 232, 225),
+    color(140, 242, 226),
+    color(232, 236, 90)
   ];
 
   initializeRegions();
   initializeFieldCache();
 }
 
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  initializeFieldCache(); // IMPORTANT — your cache depends on size
+}
+  
 function draw() {
   background(246, 245, 240);
 
