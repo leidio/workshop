@@ -99,7 +99,7 @@ function windowResized() {
 }
   
 function draw() {
-  background(246, 245, 240);
+  background(255, 252, 245);
 
   updateRegions();
   buildFieldCache();
@@ -439,7 +439,7 @@ function terrainColor(x, y, v, modify) {
   }
 
   let wash = noise(x * 0.01 + 800, y * 0.01 + 800, frameCount * 0.012);
-  base = lerpColor(base, color(255), map(wash, 0.93, 1, 0, 0.10));
+  base = lerpColor(base, color(255), map(wash, 0.93, 1, 0, 0.06));
   base = lerpColor(base, color(255), 0.05);
 
   // subtle extra palette participation
