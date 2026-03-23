@@ -43,14 +43,14 @@ function setup() {
   noStroke();
 
   palette = [
-    color(238, 239, 232),
-    color(220, 232, 225),
-    color(140, 242, 226),
-    color(232, 236, 90),
-    color(42, 36, 92),
-    color(198, 186, 228),
-    color(232, 210, 140),
-    color(0, 210, 190)
+    color(238, 239, 232), // 0 offWhite
+    color(220, 232, 225), // 1 paleGround
+    color(140, 242, 226), // 2 cyan
+    color(232, 236, 90),  // 3 yellow
+    color(42, 36, 92),    // 4 indigo
+    color(198, 186, 228), // 5 lavender
+    color(232, 210, 140), // 6 ochre
+    color(0, 210, 190)    // 7 blueGreen
   ];
 
   if (windowWidth > 1800) {
@@ -472,7 +472,7 @@ function materialNoiseColor(x, y, fillMode, fillPhase, influence) {
   if (fillMode === 0) {
     let stepped = floor(energy * 8) / 7;
     let c = lerpColor(cyan, yellow, stepped);
-    c = lerpColor(c, blueGreen, n2 * 0.18);
+    c = lerpColor(c, blueGreen, n2 * 0.15);
     return lerpColor(c, offWhite, n3 * 0.22);
   }
 
@@ -480,41 +480,22 @@ function materialNoiseColor(x, y, fillMode, fillPhase, influence) {
     let stripes = sin((x * 0.1 + y * 0.045) + t * 4.5 + fillPhase);
     let mix = map(stripes, -1, 1, 0, 1);
     let c = lerpColor(offWhite, cyan, mix);
-    c = lerpColor(c, lavender, n3 * 0.14);
-    return lerpColor(c, yellow, n2 * 0.24);
+    c = lerpColor(c, lavender, n3 * 0.10);
+    return lerpColor(c, yellow, n2 * 0.22);
   }
 
   if (fillMode === 2) {
     let q = quantize(energy, 0.12);
     let c = lerpColor(paleGround, cyan, q);
-    c = lerpColor(c, ochre, n2 * 0.16);
-    return lerpColor(c, yellow, n1 * 0.18);
+    c = lerpColor(c, ochre, n2 * 0.12);
+    return lerpColor(c, yellow, n1 * 0.16);
   }
 
   let rings = sin((x * 0.045 + y * 0.04) + t * 2.8 + fillPhase);
   let mix = map(rings, -1, 1, 0, 1);
   let c = lerpColor(offWhite, yellow, mix);
-  c = lerpColor(c, blueGreen, n2 * 0.24);
-  return lerpColor(c, indigo, map(n3, 0.8, 1, 0, 0.10, true));
-}
-
-  if (fillMode === 1) {
-    let stripes = sin((x * 0.1 + y * 0.045) + t * 4.5 + fillPhase);
-    let mix = map(stripes, -1, 1, 0, 1);
-    let c = lerpColor(offWhite, cyan, mix);
-    return lerpColor(c, yellow, n2 * 0.28);
-  }
-
-  if (fillMode === 2) {
-    let q = quantize(energy, 0.12);
-    let c = lerpColor(paleGround, cyan, q);
-    return lerpColor(c, yellow, n1 * 0.2);
-  }
-
-  let rings = sin((x * 0.045 + y * 0.04) + t * 2.8 + fillPhase);
-  let mix = map(rings, -1, 1, 0, 1);
-  let c = lerpColor(offWhite, yellow, mix);
-  return lerpColor(c, cyan, n2 * 0.3);
+  c = lerpColor(c, blueGreen, n2 * 0.20);
+  return lerpColor(c, indigo, map(n3, 0.82, 1, 0, 0.08, true));
 }
 
 function quantize(v, step) {
