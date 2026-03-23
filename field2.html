@@ -3,27 +3,25 @@
 <head>
   <meta charset="utf-8">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
-  <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #f6f5f0;
-  }
-  
-  canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-  </style>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #f6f5f0;
+}
+
+canvas {
+  display: block;
+}
+</style>
 
 </head>
 <body>
 <script>
-let sampleStep = 6;
+let sampleStep = 4;
 
 let terrainScale = 0.0055;
 let terrainSpeed = 0.022;
@@ -51,14 +49,29 @@ function setup() {
     color(232, 236, 90)
   ];
 
-  if (windowWidth > 1400) {
-    sampleStep = 7;
-  }
   if (windowWidth > 1800) {
-    sampleStep = 8;
+    sampleStep = 5;
+  } else if (windowWidth > 1400) {
+    sampleStep = 5;
+  } else {
+    sampleStep = 4;
   }
 
   initializeRegions();
+  initializeFieldCache();
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+
+  if (windowWidth > 1800) {
+    sampleStep = 5;
+  } else if (windowWidth > 1400) {
+    sampleStep = 5;
+  } else {
+    sampleStep = 4;
+  }
+
   initializeFieldCache();
 }
 
