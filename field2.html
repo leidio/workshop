@@ -1,0 +1,429 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    body { margin: 0; }
+  </style>
+</head>
+<body>
+<script>
+let sampleStep = 6;
+
+let terrainScale = 0.0055;
+let terrainSpeed = 0.022;
+
+let palette = [];
+let regions = [];
+
+let reseedInterval = 720;
+let reseedClock = 0;
+
+let fieldCache = [];
+let cacheStep = 10;
+let cacheCols = 0;
+let cacheRows = 0;
+
+function setup() {
+  createCanvas(900, 1200);
+  noStroke();
+
+  palette = [
+    color(238, 239, 232), // off-white
+    color(220, 232, 225), // pale ground
+    color(140, 242, 226), // cyan
+    color(232, 236, 90)   // yellow
+  ];
+
+  initializeRegions();
+  initializeFieldCache();
+}
+
+function draw() {
+  background(246, 245, 240);
+
+  updateRegions();
+  buildFieldCache();
+
+  drawTerrainBands();
+  drawContourField();
+  drawSecondaryTrace();
+}
+
+function initializeRegions() {
+  regions = [];
+
+  for (let i = 0; i < 7; i++) {
+    regions.push(makeRegion(random(width), random(height)));
+  }
+}
+
+function makeRegion(x, y) {
+  return {
+    x: x,
+    y: y,
+    vx: random(-1.2, 1.2),
+    vy: random(-1.2, 1.2),
+    rx: random(90, 210),
+    ry: random(80, 200),
+    angle: random(TWO_PI),
+    angleSpeed: random(-0.01, 0.01),
+    wobble: random(10, 45),
+    phase: random(TWO_PI),
+    strength: random(0.45, 1.1),
+    terrace: floor(random(6, 16)),
+    fillMode: floor(random(4)),
+    driftNoiseOffset: random(1000)
+  };
+}
+
+function updateRegions() {
+  reseedClock++;
+
+  for (let i = 0; i < regions.length; i++) {
+    let r = regions[i];
+    let t = frameCount * 0.01;
+
+    let driftX = map(
+      noise(r.driftNoiseOffset, t),
+      0,
+      1,
+      -0.8,
+      0.8
+    );
+    let driftY = map(
+      noise(r.driftNoiseOffset + 100, t),
+      0,
+      1,
+      -0.8,
+      0.8
+    );
+
+    r.x += r.vx * 1.35 + driftX * 1.2;
+    r.y += r.vy * 1.35 + driftY * 1.2;
+
+    r.angle += r.angleSpeed * 1.5 + sin(t + r.phase) * 0.004;
+
+    r.rx += sin(t * 1.4 + r.phase) * 0.7;
+    r.ry += cos(t * 1.2 + r.phase) * 0.7;
+
+    if (r.x < -160) r.x = width + 160;
+    if (r.x > width + 160) r.x = -160;
+    if (r.y < -160) r.y = height + 160;
+    if (r.y > height + 160) r.y = -160;
+  }
+
+  if (reseedClock > reseedInterval) {
+    reseedClock = 0;
+
+    let idx = floor(random(regions.length));
+    regions[idx] = makeRegion(random(width), random(height));
+  }
+}
+
+function initializeFieldCache() {
+  cacheCols = floor(width / cacheStep) + 1;
+  cacheRows = floor(height / cacheStep) + 1;
+  fieldCache = new Array(cacheRows);
+
+  for (let row = 0; row < cacheRows; row++) {
+    fieldCache[row] = new Array(cacheCols);
+  }
+}
+
+function buildFieldCache() {
+  for (let row = 0; row < cacheRows; row++) {
+    let y = row * cacheStep;
+
+    for (let col = 0; col < cacheCols; col++) {
+      let x = col * cacheStep;
+      fieldCache[row][col] = interventionValue(x, y);
+    }
+  }
+}
+
+function cachedIntervention(x, y) {
+  let col = constrain(round(x / cacheStep), 0, cacheCols - 1);
+  let row = constrain(round(y / cacheStep), 0, cacheRows - 1);
+  return fieldCache[row][col];
+}
+
+function drawTerrainBands() {
+  for (let y = 0; y < height; y += sampleStep) {
+    for (let x = 0; x < width; x += sampleStep) {
+      let base = terrainValue(x, y);
+      let modify = cachedIntervention(x, y);
+      let v = base + modify.delta;
+
+      let c = terrainColor(x, y, v, modify);
+      fill(c);
+      rect(x, y, sampleStep + 1, sampleStep + 1);
+    }
+  }
+}
+
+function drawContourField() {
+  noFill();
+
+  for (let y = 0; y < height; y += 8) {
+    beginShape();
+    for (let x = 0; x < width; x += 5) {
+      let base = terrainValue(x, y);
+      let modify = cachedIntervention(x, y);
+      let v = base + modify.delta;
+
+      let contourY = y + map(v, -1, 1, -38, 38);
+
+      if (modify.terraceInfluence > 0.08) {
+        contourY = quantize(
+          contourY,
+          map(modify.terraceInfluence, 0.08, 1, 8, 2.2)
+        );
+      }
+
+      let alpha = map(modify.edge + modify.regionInfluence, 0, 1.8, 22, 130);
+      stroke(24, alpha);
+      strokeWeight(map(modify.edge, 0, 1, 0.4, 1.5));
+
+      vertex(x, contourY);
+    }
+    endShape();
+  }
+}
+
+function drawSecondaryTrace() {
+  stroke(0, 14);
+  strokeWeight(0.35);
+  noFill();
+
+  for (let y = 0; y < height; y += 24) {
+    beginShape();
+    for (let x = 0; x < width; x += 10) {
+      let modify = cachedIntervention(x, y);
+
+      let dx = 0;
+      let dy = 0;
+
+      if (modify.trace > 0.06) {
+        dx = map(noise(x * 0.014, y * 0.014, frameCount * 0.025), 0, 1, -4, 4);
+        dy = map(noise(x * 0.014 + 200, y * 0.014 + 200, frameCount * 0.025), 0, 1, -4, 4);
+      }
+
+      vertex(x + dx, y + dy);
+    }
+    endShape();
+  }
+}
+
+function terrainValue(x, y) {
+  let t = frameCount * terrainSpeed;
+
+  let n1 = noise(x * terrainScale, y * terrainScale, t);
+  let n2 = noise(x * terrainScale * 2.4 + 100, y * terrainScale * 2.4 + 100, t * 0.85);
+  let n3 = noise(x * terrainScale * 0.8 + 300, y * terrainScale * 0.8 + 300, t * 0.42);
+
+  let wave1 = sin(x * 0.009 + t * 2.2) * 0.22;
+  let wave2 = cos(y * 0.011 - t * 1.8) * 0.16;
+  let wave3 = sin((x + y) * 0.0048 + t * 1.35) * 0.12;
+
+  let v = map(n1, 0, 1, -0.58, 0.58)
+        + map(n2, 0, 1, -0.3, 0.3)
+        + map(n3, 0, 1, -0.22, 0.22)
+        + wave1
+        + wave2
+        + wave3;
+
+  return constrain(v, -1, 1);
+}
+
+function interventionValue(x, y) {
+  let best1 = null;
+  let best2 = null;
+
+  for (let i = 0; i < regions.length; i++) {
+    let r = regions[i];
+    let s = regionSample(x, y, r);
+
+    if (!best1 || s.influence > best1.influence) {
+      best2 = best1;
+      best1 = s;
+    } else if (!best2 || s.influence > best2.influence) {
+      best2 = s;
+    }
+  }
+
+  if (!best1) {
+    return {
+      delta: 0,
+      edge: 0,
+      trace: 0,
+      terraceInfluence: 0,
+      fillInfluence: 0,
+      fillMode: 0,
+      fillPhase: 0,
+      regionInfluence: 0
+    };
+  }
+
+  let primary = best1;
+  let secondary = best2 ? best2 : best1;
+
+  let overlap = max(0, secondary.influence);
+  let competition = 1 - abs(primary.influence - secondary.influence);
+  competition = constrain(competition, 0, 1);
+
+  let regionInfluence = primary.influence;
+  let edge = competition * primary.influence;
+
+  let delta = primary.facetedValue * primary.region.strength * primary.influence * 1.9;
+  delta += secondary.facetedValue * secondary.region.strength * secondary.influence * 0.35;
+  delta += competition * 0.22 * sin(frameCount * 0.035 + primary.region.phase);
+
+  let terraceInfluence = max(primary.influence, competition * 0.9);
+  let fillInfluence = max(primary.influence, overlap * 0.75);
+  let trace = max(primary.influence * 0.9, competition * 0.8);
+
+  return {
+    delta: delta,
+    edge: edge,
+    trace: trace,
+    terraceInfluence: terraceInfluence,
+    fillInfluence: fillInfluence,
+    fillMode: primary.region.fillMode,
+    fillPhase: primary.region.phase,
+    regionInfluence: regionInfluence
+  };
+}
+
+function regionSample(x, y, r) {
+  let t = frameCount * 0.02;
+
+  let cx = r.x + sin(t * 1.3 + r.phase) * r.wobble;
+  let cy = r.y + cos(t * 1.05 + r.phase) * r.wobble * 0.7;
+
+  let angle = r.angle + sin(t * 0.8 + r.phase) * 0.22;
+
+  let dx = x - cx;
+  let dy = y - cy;
+
+  let ca = cos(-angle);
+  let sa = sin(-angle);
+
+  let lx = dx * ca - dy * sa;
+  let ly = dx * sa + dy * ca;
+
+  let rx = r.rx * (1 + sin(t * 1.2 + r.phase) * 0.22);
+  let ry = r.ry * (1 + cos(t * 1.1 + r.phase) * 0.22);
+
+  let nx = abs(lx) / rx;
+  let ny = abs(ly) / ry;
+
+  let shapePower = 1.25;
+  let d = pow(nx, shapePower) + pow(ny, shapePower);
+
+  let influence = constrain(map(d, 1.12, 0.0, 0, 1), 0, 1);
+  influence = ease(influence);
+
+  let plane = (lx * 1.18 + ly * 0.55) / max(rx, ry);
+  let stepped = quantize(plane, 2 / r.terrace);
+
+  let internalNoise = map(
+    noise(lx * 0.035 + 1000, ly * 0.035 + 1000, frameCount * 0.03 + r.phase),
+    0,
+    1,
+    -0.32,
+    0.32
+  );
+
+  return {
+    influence: influence,
+    facetedValue: stepped + internalNoise * 0.4,
+    region: r
+  };
+}
+
+function terrainColor(x, y, v, modify) {
+  let offWhite = palette[0];
+  let paleGround = palette[1];
+  let cyan = palette[2];
+  let yellow = palette[3];
+
+  let nGround = noise(x * 0.03, y * 0.03, frameCount * 0.012);
+  let nFine = noise(x * 0.09 + 500, y * 0.09 + 500, frameCount * 0.018);
+
+  let base = lerpColor(offWhite, paleGround, map(nGround, 0, 1, 0.1, 0.85));
+  base = lerpColor(base, color(250, 248, 239), nFine * 0.2);
+
+  let band = floor(map(v, -1, 1, 0, 7));
+  band = constrain(band, 0, 7);
+
+  if (band === 2 || band === 4) {
+    base = lerpColor(base, cyan, 0.16);
+  }
+  if (band === 5) {
+    base = lerpColor(base, yellow, 0.14);
+  }
+
+  if (modify.fillInfluence > 0.01) {
+    let noisy = materialNoiseColor(x, y, modify.fillMode, modify.fillPhase, modify.regionInfluence);
+    base = lerpColor(base, noisy, constrain(modify.fillInfluence * 1.5, 0, 1));
+  }
+
+  let wash = noise(x * 0.01 + 800, y * 0.01 + 800, frameCount * 0.012);
+  base = lerpColor(base, color(255), map(wash, 0.93, 1, 0, 0.12));
+
+  return color(red(base), green(base), blue(base), 236);
+}
+
+function materialNoiseColor(x, y, fillMode, fillPhase, influence) {
+  let t = frameCount * 0.025;
+
+  let n1 = noise(x * 0.06, y * 0.06, t + fillPhase);
+  let n2 = noise(x * 0.14 + 200, y * 0.14 + 200, t * 0.9 + fillPhase);
+  let n3 = noise(x * 0.025 + 400, y * 0.025 + 400, t * 1.25 + fillPhase);
+
+  let flow = sin(x * 0.04 + t * 3.5 + fillPhase) * cos(y * 0.035 - t * 2.6 + fillPhase);
+  let energy = constrain(n1 * 0.45 + n2 * 0.35 + n3 * 0.22 + flow * 0.2, 0, 1);
+
+  let offWhite = palette[0];
+  let paleGround = palette[1];
+  let cyan = palette[2];
+  let yellow = palette[3];
+
+  if (fillMode === 0) {
+    let stepped = floor(energy * 8) / 7;
+    let c = lerpColor(cyan, yellow, stepped);
+    return lerpColor(c, offWhite, n3 * 0.24);
+  }
+
+  if (fillMode === 1) {
+    let stripes = sin((x * 0.1 + y * 0.045) + t * 4.5 + fillPhase);
+    let mix = map(stripes, -1, 1, 0, 1);
+    let c = lerpColor(offWhite, cyan, mix);
+    return lerpColor(c, yellow, n2 * 0.28);
+  }
+
+  if (fillMode === 2) {
+    let q = quantize(energy, 0.12);
+    let c = lerpColor(paleGround, cyan, q);
+    return lerpColor(c, yellow, n1 * 0.2);
+  }
+
+  let rings = sin((x * 0.045 + y * 0.04) + t * 2.8 + fillPhase);
+  let mix = map(rings, -1, 1, 0, 1);
+  let c = lerpColor(offWhite, yellow, mix);
+  return lerpColor(c, cyan, n2 * 0.3);
+}
+
+function quantize(v, step) {
+  return round(v / step) * step;
+}
+
+function ease(v) {
+  return v * v * (3 - 2 * v);
+}
+
+</script>
+</body>
+</html>
